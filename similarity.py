@@ -6,14 +6,6 @@ import helper.helper as help
 import meanCentered as mc
 import prediction as pc
 
-import pandas as pd
-import numpy as np
-import helper.helper as hp
-import cmath
-import helper.helper as help
-import meanCentered as mc
-import prediction as pc
-
 class Pearson(mc.MeanCentered, pc.Prediction):
     """
     Kelas Pearson digunakan untuk menghitung Pearson Correlation Coefficient sebagai
@@ -492,11 +484,6 @@ class ACosine(mc.MeanCentered, pc.Prediction):
             DataFrame yang berisi nilai Asymmetric Cosine similarity.
         """
         return pd.DataFrame(self.result)
-
-
-import pandas as pd
-import cmath
-import helper.helper as hp
 
 class BC(mc.MeanCentered, pc.Prediction):
     """

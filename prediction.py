@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import helper.helper as hp
-import cmath
 
 class Prediction:
     """
@@ -162,7 +161,10 @@ class Prediction:
         indexZero = hp.checkIndexZeroOfData(data=data, index=indexUser if opsional == 0 else index, indexUser=indexUser if opsional == 1 else index)
         # Membuat Index Similarity
         indexOfNeighborhood = list(np.delete(hp.createList(0, len(neighborhood[indexUser]) - 1), indexZero).tolist())
-        neighborhood = list(np.delete(neighborhood[indexUser], indexZero).tolist())
+        # Index Neighborhood Item based = Index
+        # Index Neighborhood User based = IndexUser
+        print(f"Similarity[{indexUser if opsional == 1 else index}] :",neighborhood[indexUser if opsional == 1 else index])
+        neighborhood = list(np.delete(neighborhood[indexUser if opsional == 1 else index], indexZero).tolist())
 
         # Mengurutkan similarity dan tetangganya
         lengthLoop = len(neighborhood)
@@ -183,9 +185,11 @@ class Prediction:
                     innerCondition = False
             neighborhood[indexFlag] = prevNeighborhood
             indexOfNeighborhood[indexFlag] = prevIndexList
-
+        # Index Mean Centered Item Based = IndexUser
+        # Index Mean Centered User Based = Index
+        print(f"MeanCentered[{indexUser if opsional ==  0 else index}] : {meanCentered[indexUser if opsional ==  0 else index]}")
         indexOfNeighborhood = [
-            (meanCentered[indexUser][i]) 
+            (meanCentered[indexUser if opsional ==  0 else index][i]) 
             for i in indexOfNeighborhood[0:k]
         ]
         return [neighborhood[0:k], indexOfNeighborhood]
@@ -206,8 +210,14 @@ class Prediction:
         float
             Nilai prediksi berdasarkan formula Collaborative Filtering.
         """
+        print("User Index :",userTarget,"Item Index :",item)
+        print("Similarity :", self.similarity)
+        print("Main Centered :", hp.reverseMatrix(self.mean_centered) if not self.twins else hp.reverseMatrix(self.mean_centered_result_brother))
         target = self.selectedNeighborhood(self.similarity, item, userTarget, self.k, self.data, self.mean_centered if not self.twins else hp.reverseMatrix(self.mean_centered_result_brother), opsional=self.opsional, twins=self.twins)
-        return (self.meanList[userTarget if self.opsional == 1 else item] if not self.twins else self.meanListBrother[userTarget if self.opsional == 1 else item]) + self.numeratorPrediction(target[0], target[1]) / self.denominatorPrediction(target[0])
+        print(target)
+        return (self.meanList[userTarget if self.opsional == 1 else item] 
+                if not self.twins else 
+                self.meanListBrother[userTarget if self.opsional == 1 else item]) + self.numeratorPrediction(target[0], target[1]) / self.denominatorPrediction(target[0])
 
     def main_prediction_measure(self, data):
         """
