@@ -58,7 +58,7 @@ class MeanCentered:
         twins : bool, optional
             True jika ingin menghitung mean-centered dari meanList kembar (default: False).
         """
-        self.data = data if opsional != 0 else hp.reverseMatrix(data)
+        self.data = data if opsional != "item-based" else hp.reverseMatrix(data)
         self.opsional = opsional
         self.meanList = [self.mean(i) for i in self.data]
         self.meanListBrother = [self.mean(i) for i in hp.reverseMatrix(self.data)] if twins else []
@@ -98,20 +98,10 @@ class MeanCentered:
         list of list
             Matriks mean-centered yang telah disesuaikan dengan meanList yang diberikan.
         """
-        if self.opsional == 1:  # User-based mean-centered
-            return [[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))]
-        else:  # Item-based mean-centered
-            result = []
-            for i in range(len(data)):
-                resultInner = []
-                for j in range(len(data[i])):
-                    if data[i][j] == 0:
-                        resultInner.append(0)
-                        continue
-                    m = data[i][j] - meanList[i]
-                    resultInner.append(m)
-                result.append(resultInner)
-            return result
+        return [
+                [(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] 
+                    for i in range(len(data))
+                ]
 
     def getMeanCenteredArray(self):
         """

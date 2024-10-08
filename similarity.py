@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 import numpy as np
 import helper.helper as hp
 import cmath
@@ -58,6 +59,7 @@ class Pearson(mc.MeanCentered, pc.Prediction):
             Jumlah tetangga (neighbors) yang akan dipertimbangkan dalam prediksi.
         """
         super().__init__(data, opsional=opsional)
+        self.start = time.time()
         self.result = self.mainSimilarityMeasure()
         pc.Prediction.__init__(self, self.mean_centered_result, self.result, data, meanList=self.meanList, opsional=opsional, k=k)
 
@@ -97,7 +99,7 @@ class Pearson(mc.MeanCentered, pc.Prediction):
         float
             Nilai hasil perkalian magnitudo (panjang) dari dua vektor.
         """
-        return cmath.sqrt(sum((data1[i]**2) for i in range(len(data1)))) * cmath.sqrt(sum((data2[i]**2) for i in range(len(data1))))
+        return cmath.sqrt(sum((data1[i]**2) for i in range(len(data1)))) * cmath.sqrt(sum((data2[i]**2) for i in range(len(data2))))
 
     def measureSimilarity(self, u, v, data, meanC=[]):
         """
@@ -119,13 +121,17 @@ class Pearson(mc.MeanCentered, pc.Prediction):
         float
             Nilai Pearson similarity antara dua vektor.
         """
+        print("Item :",u,"dan",v)
         tempMc1 = [meanC[u][mc1] for mc1 in range(len(data[u]))]
+        print("MC Before",tempMc1)
         tempMc2 = [meanC[v][mc2] for mc2 in range(len(data[v]))]
 
         tempMc1 = np.delete(tempMc1, help.indexOfZero(data[u], data[v]))
         tempMc2 = np.delete(tempMc2, help.indexOfZero(data[u], data[v]))
+        print("Index 0 :",help.indexOfZero(data[u], data[v]))
+        print("MC After :",tempMc1)
         denom = self.denominator(tempMc1, tempMc2)
-        return self.numerator(tempMc1, tempMc2) / denom if denom != 0 else 0
+        return (self.numerator(tempMc1, tempMc2) / denom) if denom != 0 else 0
 
     def mainSimilarityMeasure(self):
         """
@@ -137,7 +143,7 @@ class Pearson(mc.MeanCentered, pc.Prediction):
             Matriks similarity yang berisi nilai Pearson similarity antara setiap pasangan vektor.
         """
         result = [[] for _ in range(len(self.data))]
-        for i in range(len(self.data)):
+        for i in range(len(self.data)): 
             for j in range(i, len(self.data)):
                 if i == j:
                     result[i].append(1)
@@ -180,8 +186,8 @@ class Cosine(Pearson):
     -----------
     data : list of list
         Matriks data masukan untuk perhitungan similarity.
-    opsional : int
-        0 untuk pendekatan item-based, 1 untuk pendekatan user-based.
+    opsional : str
+        item-based, user-based.
     k : int
         Jumlah tetangga (neighbors) yang akan dipertimbangkan dalam prediksi.
     result : list of list
@@ -201,9 +207,6 @@ class Cosine(Pearson):
     mainSimilarityMeasure()
         Menghitung similarity untuk semua pasangan vektor dalam data yang diberikan.
 
-    neighborhood(u, i)
-        Menentukan tetangga (neighbors) dari vektor tertentu.
-
     getSimilarityArray()
         Mengembalikan hasil perhitungan similarity dalam bentuk array numpy.
 
@@ -218,8 +221,8 @@ class Cosine(Pearson):
         -----------
         data : list of list
             Matriks data masukan untuk perhitungan similarity.
-        opsional : int
-            0 untuk pendekatan item-based, 1 untuk pendekatan user-based.
+        opsional : str
+            item-based, user-based.
         k : int
             Jumlah tetangga (neighbors) yang akan dipertimbangkan dalam prediksi.
         """
@@ -253,7 +256,7 @@ class Cosine(Pearson):
         tempMc2 = np.delete(tempMc2,help.indexOfZero(data[u],data[v]))
 
         denom = self.denominator(data[v],data[u])
-        return self.numerator(tempMc1,tempMc2) / denom if denom != 0 else 0
+        return (self.numerator(tempMc1,tempMc2) / denom) if denom != 0 else 0
 
     def mainSimilarityMeasure(self) :
         """
@@ -289,8 +292,8 @@ class ACosine(mc.MeanCentered, pc.Prediction):
     -----------
     data : list of list
         Matriks data masukan untuk perhitungan similarity.
-    opsional : int
-        0 untuk pendekatan item-based, 1 untuk pendekatan user-based.
+    opsional : str
+        item-based, user-based.
     k : int
         Jumlah tetangga (neighbors) yang akan dipertimbangkan dalam prediksi.
     result : list of list
@@ -332,12 +335,12 @@ class ACosine(mc.MeanCentered, pc.Prediction):
         -----------
         data : list of list
             Matriks data masukan untuk perhitungan similarity.
-        opsional : int
-            0 untuk pendekatan item-based, 1 untuk pendekatan user-based.
+        opsional : str
+            item-based, user-based.
         k : int
             Jumlah tetangga (neighbors) yang akan dipertimbangkan dalam prediksi.
         """
-        super().__init__(data, opsional=0 if opsional == 1 else 1, twins=True)
+        super().__init__(data, opsional="item-based" if opsional == "user-based" else "user-based", twins=True)
         self.result = self.mainSimilarityMeasure()
         pc.Prediction.__init__(self, self.mean_centered_result, self.result, data, 
                                meanList=self.meanList, meanListBrother=self.meanListBrother,
@@ -398,9 +401,9 @@ class ACosine(mc.MeanCentered, pc.Prediction):
         list of list
             Matriks mean-centered yang telah disesuaikan dengan meanList yang diberikan.
         """
-        if self.opsional == 0:
+        if self.opsional == "item-based":
             return [[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))]
-        elif self.opsional == 1:
+        elif self.opsional == "user-based":
             result = []
             for i in range(len(data)):
                 resultInner = []
@@ -439,7 +442,7 @@ class ACosine(mc.MeanCentered, pc.Prediction):
         tempMc1 = np.delete(tempMc1, help.indexOfZero(data[u], data[v]))
         tempMc2 = np.delete(tempMc2, help.indexOfZero(data[u], data[v]))
         denom = self.denominator(tempMc1, tempMc2).real
-        return self.numerator(tempMc1, tempMc2) / denom if denom != 0 else 0
+        return (self.numerator(tempMc1, tempMc2) / denom) if denom != 0 else 0
     
     def mainSimilarityMeasure(self):
         """
@@ -458,7 +461,7 @@ class ACosine(mc.MeanCentered, pc.Prediction):
                     result[i].append(1)
                     continue
                 similarity_result = self.measureSimilarity(i, j, hp.reverseMatrix(self.data),
-                self.mean_centered_result if self.opsional == 1 else hp.reverseMatrix(self.mean_centered_result))
+                self.mean_centered_result if self.opsional == "user-based" else hp.reverseMatrix(self.mean_centered_result))
                 result[i].append(similarity_result)
                 result[j].append(similarity_result)
         return result
@@ -534,8 +537,8 @@ class BC(mc.MeanCentered, pc.Prediction):
         -----------
         data : list of list
             Matriks data masukan yang akan diproses.
-        opsional : int
-            0 untuk pendekatan item-based, 1 untuk pendekatan user-based.
+        opsional : str
+            item-based, user-based.
         k : int
             Jumlah tetangga terdekat yang akan digunakan dalam prediksi (untuk superclass `Prediction`).
         """
