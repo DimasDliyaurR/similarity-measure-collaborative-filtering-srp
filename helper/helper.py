@@ -2,7 +2,10 @@ def indexOfZero (data1,data2):
     return [i for i in range(len(data2)) if data1[i] == 0 or data2[i] == 0]
 
 def checkIndexZeroOfData (*,data,indexUser,fixIndex,maxIndex):
+    print(fixIndex,"fix")
     result = [i for i in range(len(data[indexUser])) if data[indexUser][i] == 0 and maxIndex > i]
+    print(data[indexUser],"data dicek")
+    print(result,"fix-zero")
     if not heyStack(fixIndex,result) :
         result.append(indexUser)
     return result

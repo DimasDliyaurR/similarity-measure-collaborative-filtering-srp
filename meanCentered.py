@@ -1,5 +1,5 @@
-import pandas as pd
 import helper.helper as hp
+import pandas as pd
 
 class MeanCentered:
     """
@@ -66,7 +66,7 @@ class MeanCentered:
         self.mean_centered_result_brother = self.mean_centered_measure(hp.reverseMatrix(self.data), self.meanListBrother) if twins else []
 
     @staticmethod
-    def mean(data):
+    def mean(data) -> float:
         """
         Menghitung mean dari vektor yang diberikan, mengabaikan elemen nol.
 
@@ -82,7 +82,7 @@ class MeanCentered:
         """
         return sum([j for j in data if j != 0]) / len([j for j in data if j != 0])
 
-    def mean_centered_measure(self, data, meanList):
+    def mean_centered_measure(self, data, meanList) -> list[list]:
         """
         Menghasilkan mean-centered data berdasarkan meanList yang diberikan.
 
@@ -98,10 +98,7 @@ class MeanCentered:
         list of list
             Matriks mean-centered yang telah disesuaikan dengan meanList yang diberikan.
         """
-        return [
-                [(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] 
-                    for i in range(len(data))
-                ]
+        return [[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))]
 
     def getMeanCenteredArray(self):
         """
@@ -113,15 +110,15 @@ class MeanCentered:
             Array numpy yang berisi mean-centered data.
         """
         return self.mean_centered_result
-
+   
     def getMeanCenteredDataFrame(self):
         """
-        Mengembalikan mean-centered data dalam bentuk DataFrame pandas.
+        Mengembalikan mean-centered data dalam bentuk array numpy.
 
         Returns:
         --------
-        pandas.DataFrame
-            DataFrame yang berisi mean-centered data.
+        numpy.ndarray
+            Array numpy yang berisi mean-centered data.
         """
         return pd.DataFrame(self.mean_centered_result)
 
@@ -135,14 +132,14 @@ class MeanCentered:
             Array numpy yang berisi mean dari setiap vektor dalam data.
         """
         return self.meanList
-
+    
     def getMeanListDataFrame(self):
         """
-        Mengembalikan daftar mean dalam bentuk DataFrame pandas.
+        Mengembalikan daftar mean dalam bentuk array numpy.
 
         Returns:
         --------
-        pandas.DataFrame
-            DataFrame yang berisi mean dari setiap vektor dalam data.
+        numpy.ndarray
+            Array numpy yang berisi mean dari setiap vektor dalam data.
         """
         return pd.DataFrame(self.meanList)

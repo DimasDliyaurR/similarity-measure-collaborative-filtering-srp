@@ -155,10 +155,10 @@ class Prediction:
             Daftar `k` tetangga terdekat beserta mean-centered data dari tetangga tersebut.
         """
         # data = hp.reverseMatrix(data) if opsional == 1 else data
+        # neighborhood = neighborhood if opsional == "item-based" else hp.reverseMatrix(neighborhood)
         meanCentered = hp.reverseMatrix(meanCentered) if not twins or opsional == "item-based" else meanCentered
-
         # indexZero = hp.checkIndexZeroOfData(data=data, index=indexUser if opsional == 0 else index, indexUser=indexUser if opsional == 1 else index)
-        indexZero = hp.checkIndexZeroOfData(data=data, fixIndex=indexUser if opsional == "user-based" else index, indexUser=indexUser,maxIndex=len(neighborhood))
+        indexZero = hp.checkIndexZeroOfData(data=hp.reverseMatrix(data) if opsional == "user-based" else data, fixIndex=indexUser if opsional == "user-based" else index, indexUser=indexUser if opsional == "item-based" else index,maxIndex=len(neighborhood))
         # Membuat Index Similarity
         indexOfNeighborhood = list(np.delete(hp.createList(0, len(neighborhood[indexUser]) - 1), indexZero).tolist())
         # Index Neighborhood Item based = Index
@@ -210,6 +210,7 @@ class Prediction:
         float
             Nilai prediksi berdasarkan formula Collaborative Filtering.
         """
+        print("user :",userTarget,"item :",item)
         target = self.selectedNeighborhood(self.similarity, item, userTarget, self.k, self.data, self.mean_centered if not self.twins else hp.reverseMatrix(self.mean_centered_result_brother), opsional=self.opsional, twins=self.twins)
         average = self.meanList[userTarget if self.opsional == "user-based" else item] if not self.twins else (self.meanListBrother[userTarget if self.opsional == "user-based" else item])
         print("Rata-rata :",average)

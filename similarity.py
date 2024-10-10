@@ -121,15 +121,11 @@ class Pearson(mc.MeanCentered, pc.Prediction):
         float
             Nilai Pearson similarity antara dua vektor.
         """
-        print("Item :",u,"dan",v)
         tempMc1 = [meanC[u][mc1] for mc1 in range(len(data[u]))]
-        print("MC Before",tempMc1)
         tempMc2 = [meanC[v][mc2] for mc2 in range(len(data[v]))]
 
         tempMc1 = np.delete(tempMc1, help.indexOfZero(data[u], data[v]))
         tempMc2 = np.delete(tempMc2, help.indexOfZero(data[u], data[v]))
-        print("Index 0 :",help.indexOfZero(data[u], data[v]))
-        print("MC After :",tempMc1)
         denom = self.denominator(tempMc1, tempMc2)
         return (self.numerator(tempMc1, tempMc2) / denom) if denom != 0 else 0
 
@@ -401,20 +397,7 @@ class ACosine(mc.MeanCentered, pc.Prediction):
         list of list
             Matriks mean-centered yang telah disesuaikan dengan meanList yang diberikan.
         """
-        if self.opsional == "item-based":
-            return [[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))]
-        elif self.opsional == "user-based":
-            result = []
-            for i in range(len(data)):
-                resultInner = []
-                for j in range(len(data[i])):
-                    if data[i][j] == 0:
-                        resultInner.append(0)
-                        continue
-                    m = data[i][j] - meanList[i]
-                    resultInner.append(m)
-                result.append(resultInner)
-            return hp.reverseMatrix(result)
+        return [[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))] if self.opsional == "item-based" else hp.reverseMatrix([[(data[i][j] - meanList[i] if data[i][j] != 0 else 0) for j in range(len(data[i]))] for i in range(len(data))]) 
     
     def measureSimilarity(self, u, v, data, meanC=[]):
         """
